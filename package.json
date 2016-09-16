@@ -22,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/kitirelia/express_web/issues"
   },
-  "homepage": "https://github.com/kitirelia/express_web#readme"
+  "homepage": "https://github.com/kitirelia/express_web#readme",
+  "dependencies": {
+    "express": "^4.14.0"
+  }
 }
