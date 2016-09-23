@@ -2,6 +2,17 @@ var LocalStrategy = require('passport-local').Strategy;
 
 var  User = require('../app/models/user');
 var chalk=require('chalk');
+var image_folder="uploads/";
+
+function randomString(len, charSet) {
+    charSet = charSet || 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var randomString = '';
+    for (var i = 0; i < len; i++) {
+    	var randomPoz = Math.floor(Math.random() * charSet.length);
+    	randomString += charSet.substring(randomPoz,randomPoz+1);
+    }
+    return randomString;
+}
 
 module.exports = function(passport){
 	passport.serializeUser(function(user,done){
@@ -17,6 +28,7 @@ module.exports = function(passport){
 	passport.use('local-signup',new LocalStrategy({
 		usernameField:'email',
 		passwordField:'password',
+		user_fullnameField:'fullname',
 		passReqToCallback:true
 	},
 	function (req,email,password,done){
@@ -29,16 +41,41 @@ module.exports = function(passport){
 					return done(null,false,req.flash('signupMessage', 'That email is already taken.'));
 				}//end if user
 				else{
-					var newUser  = new User();
-					newUser.email=email;
-					newUser.password = newUser.generateHash(password);
-
-					newUser.save(function(err) {
-	                    if (err)
-	                        throw err;
-	                    return done(null, newUser);
-	                });
-				}
+					if(password.trim().length<3){
+						return done(null,false,req.flash('signupMessage', 'password too short!.'));
+					}else{
+						var newUser  = new User();
+						newUser.email=email;
+						newUser.password = newUser.generateHash(password);
+						newUser.fullname="fullname_"+randomString(7);
+						newUser.username="username_"+randomString(7);
+						newUser.profile_image="/def/profile.jpg";
+						newUser.staff_level=5;
+						newUser.token="token here";
+						newUser.private=false;
+						newUser.save(function(err,saved) {
+		                    if (err){
+		                    	console.log(chalk.bgRed(err));
+		                    	var err_name="";
+		                    	var error_msg="Something Wrong!";
+		                    	for (field in err.errors) {
+		                    		err_name = field;
+								   	console.log(chalk.red("err:"+field ));
+								    break;
+								  }
+								  if(err_name!="")error_msg = err.errors[err_name].message;
+		             			//console.log(chalk.bgYellow(err.errors[err_name]));
+		                        return done(null,false,req.flash('signupMessage',error_msg));
+		                    }
+		                    if(saved){
+		                    	console.log(chalk.green(saved));
+		                    	return done(null, newUser);
+		                    }
+		                    
+		                });
+					}//end else pass too short
+					
+				}//end else user
 			});
 		});
 	}
@@ -50,8 +87,10 @@ module.exports = function(passport){
         passReqToCallback : true // allows us to pass back the entire request to the callback
     },
     function(req, email, password, done) { // callback with email and password from our form
-        User.findOne({ 'email' :  email }, function(err, user) {
+         User.findOne({'email' :  email}).select('password').exec(function (err, user) {
+        //User.findOne({ 'email' :  email }, function(err, user) {
             if (err){
+            	console.log(chalk.red('error '+err));
                 return done(err);
             }
             if (!user){
@@ -69,5 +108,7 @@ module.exports = function(passport){
         });
 
     }));
+
+
 	
 }//end module.exports

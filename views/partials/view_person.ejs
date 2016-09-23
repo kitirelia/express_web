@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script   src="https://code.jquery.com/jquery-1.12.4.js"   integrity="sha256-Qw82+bXyGq6MydymqBxNPYTaUXXq7c8v3CwiYwLLNXU="   crossorigin="anonymous"></script>
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	<% include ../partials/header_person_view %>
+	<title>New User View</title>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$('img').on('load', function() {
+				//console.log("id "+$(this).attr('id'));
+				if(typeof $(this).attr('id') != 'undefined'){
+			    	if(($(this).attr('id').indexOf('hash_img'))>=0  ){
+				    	if($(this).width()>$(this).height()){
+				    		$(this).addClass( "crop_for_h  " );
+				    	}else{
+				    		$(this).addClass( "crop_for_v " );
+				    	}
+			    	}
+		    	}
+			});//end load
+			
+		
+		});//end doc ready
+	</script>
+	<% include ../partials/scroll_check %>
+	<% include ../partials/modal %>
+</head>
+<body class="bg_main">
+	<% include ../partials/nav_bar %>
+	<div id='debug_container' style="margin-top:40px;">
+		<div class="row">
+			<div class="col-md-2 "></div>
+  			<div class="col-md-8 ">
+  				<div class="" style="margin-bottom:40px;">
+  					<div class='row'>
+  						<div class="col-md-4">
+							<img src="<%= profile_img  %>"  alt="profile image" height="150px" width="150px" class="img-circle img_border" style='margin-left: 30px'>
+						</div> <!-- end div-img-col-md-2 -->
+						<div class="col-md-6">
+							<div id='user_name'>
+	 							<div>
+	 								<h1 class="username_deco"><%= user_name %></h1>
+	 								<!-- <button  type="button" class="btn btn-success ">follow</button> -->
+	 							</div>
+	 							<div>
+	 								<h3  class="fullname_deco"><%= nickname %></h3>
+	 							</div>
+	 						</div>  <!-- end id user_name -->
+	 						<div id='about_user'>
+	 							<div id='user_status' class="row">
+	 								<div class="col-md-4"><span class="deco_span"><%= all_post %></span> <span class="deco_span_unit">posts</span></div>
+	  								<div class="col-md-4"><span class="deco_span"><%= followers %></span> <span class="deco_span_unit"> follower</span></div>
+	  								<div class="col-md-4"><span class="deco_span"><%= following %></span> <span class="deco_span_unit"> following</span></div>
+	 							</div> <!-- end div user_status -->
+	 						</div> <!-- end id  about_user -->
+						</div> <!-- end col-md-8 -->
+						<div class="col-md-2">
+
+						</div> <!-- end md-2 right offset -->
+  					</div>  <!-- end class row -->
+  				</div> <!-- end about_user_bg -->
+  				<div class="image_debug_bg" id="image_content">
+  					<% for(var i=0; i<data.length; i++) { %>
+				        <div class='jonat-thumbnail img_size_preview'>
+							<img  id='hash_img<%= data[i]._id %>' src="<%= data[i].filename %>" >
+						</div>
+				    <% } %>
+  				</div>
+  			</div>
+  			<div class="col-md-2 "></div>
+		</div> <!-- end class row -->
+	</div>
+
+	<!-- preload -->
+	<div class="row">
+		<div class="col-md-2 "></div>
+		<div class="col-md-8 content_tag_bg">
+		<div style="margin-top:40px;">
+			<div id='footer_preload' ></div>	
+		</div>
+		</div> <!-- end class="col-md-8 content_tag_bg" -->
+		<div class="col-md-2 "></div>
+	</div>
+</body>
+</html>

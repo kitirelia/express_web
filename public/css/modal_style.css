@@ -1,0 +1,63 @@
+.follow_go_left{
+	/*padding-left: 0px;*/
+}
+.clean_border{
+	padding: 0px;
+}
+.button_remove_space{
+	padding-left: 0px;
+	padding-right: 0px;
+}
+.force_img_size{
+	max-width: 38px;
+	max-height: 38px;
+}
+.username_color{
+	color: #262626;
+	font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding-left: 5px;
+    margin-left: -5px;
+    
+}
+.username_color a{
+	text-decoration: none;
+}
+.add_row_space{
+	margin-right: 15px;
+}
+.trunc_text{
+  width:50px; 
+  white-space: nowrap; 
+  overflow: hidden; 
+  text-overflow: ellipsis;
+}
+.crop_txt {
+	width:100px;
+	overflow:hidden;
+	height:50px;
+	line-height:50px;
+}​
+.button_bg{
+	background-color: #F7819F;
+}
+.add_20_top_bot_space{
+	margin-bottom: 20px;
+	margin-top: 20px;
+}
+/*for ejs*/
+/*for ejs*/
+/*for ejs*/
+.likes_dec{
+	font-weight: 600;
+	color: #262626;
+}
+.time_dec{
+	color: #999;
+}
+.caption_dec{
+	    font-weight: 300;
+	    color: #262626;
+}

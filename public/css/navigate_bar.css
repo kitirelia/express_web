@@ -1,0 +1,65 @@
+.nav_bg{
+			/*background-color: #81BEF7;*/
+			background-color: white;
+			/*width: 100%;*/
+			/**/
+		}
+		.left_col_bg{
+			/*background-color: #F5A9F2;*/
+			background-color: white;
+		}
+		.center_col_bg{
+			/*background-color: #F7BE81;*/
+			background-color: white;
+		}
+ 		.right_col_bg{
+ 			/*background-color: #D8D8D8;*/
+ 			background-color: white;
+ 		}
+
+ 		.inner-addon { 
+		    position: relative; 
+		}
+		.inner-addon .glyphicon {
+		  position: absolute;
+		  padding: 10px;
+		  pointer-events: none;
+		}
+		.left-addon .glyphicon  { 
+			left:  0px;
+			color: #A4A4A4;
+		}
+		.left-addon input  { 
+			padding-left:  30px;
+		}
+		.fix_input_width{
+			width: 215px;
+			margin: auto;
+		}
+		.bg_main{
+			background-color: #fafafa;
+		}
+		.nav_link_menu {
+			text-align:center;
+		}
+		.nav_link_menu a{
+			cursor: pointer;
+			cursor: hand;
+			color: #2D2D2D;
+			font-size: 18px;
+			text-decoration: none;
+		}
+  		.nav_space{
+  			margin-left: 0px;
+  			padding-top:20px;
+  			padding-bottom:20px;
+  			background-color: white;
+  			border-bottom-width:1px;
+  			border-bottom-color:#dbdbdb;
+   			border-bottom-style: solid;
+   			width: 100%;
+  		}
+  		.align_middle {
+		    
+		    vertical-align: middle;
+		}

@@ -41,7 +41,8 @@ app.use(session({ secret: configSecret.session_secret,resave: true, saveUninitia
 app.use(passport.initialize());
 app.use(passport.session()); 
 app.use(flash());
-
+app.use('/uploads', express.static(__dirname + '/uploads'));
+app.use('/public',express.static(__dirname + '/public'));
 // routes ======================================================================
 require('./app/routes_manager.js')(app, passport); // load our routes and pass in our app and fully configured passport
 

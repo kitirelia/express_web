@@ -1,0 +1,245 @@
+<script type="text/javascript">
+	var image_folder = "/uploads/flash/";
+	var tag_url ="http://localhost:3000/explore/nav_tags/";
+	var people_url ="http://localhost:3000/explore/people/";
+	//var base_url="";
+	var navigate_page="";
+	$(function(){ // this will be called when the DOM is ready
+		$('#search_txt').keyup(function(e) {
+			var key = e.which;
+			var word = $("#search_txt").val();
+			if(word.charAt(0)=="#" && key != 13){
+				var tag = word.substring(1,word.length);
+				check_explore_data(true,tag);
+			}else{
+				if(key != 13)check_explore_data(false,word);
+			}
+			if(key == 13)  // the enter key code
+			{
+				//console.log('ENTER->navigate to data[0]');
+			    navigate_first_node();
+			    return false;  
+			}//end if ENTER	
+			if(
+				(word.trim()).length==0
+				){
+				$('#search_result_item').find('ul').remove();
+			 //console.log( "get "+key,word);
+			}
+		});
+		$( "#search_txt" )
+			.focusout(function() {
+				//console.log('focus out');
+				//$("#search_result").hide();
+			})
+			.focusin(function() {
+				$("#search_result").show();
+			});
+	});//end keyup
+
+	function check_explore_data(isTag,search_str){
+		//console.log('start load');
+		search_str = search_str.trim();
+		var req_url="";
+		if(isTag){
+			req_url=tag_url+search_str;
+		}else{
+			req_url=people_url+search_str;
+		}
+		if(search_str.length){
+			var jqxhr = $.get( req_url, function(data) {
+			  //alert( "success" );
+			})
+			.done(function(data) {
+				var test=data.user;
+				//console.log(data.msg);
+				var html_str="<ul>";
+				if(data.msg=="success"){
+					if(data.type=='user'){
+						navigate_page="http://localhost:3000/explore/person/";
+						navigate_page+=test[0].username;
+					}else if(data.type!='user'){
+						navigate_page="http://localhost:3000/explore/tags/";
+						navigate_page+=test[0]._id;
+					}
+					//console.log('debug '+navigate_page);
+					for(var i=0;i<test.length;i++){
+						var left_content="";
+						var top_right_content="";
+						var click_url="";
+						var bottom_right_content="";
+						if(data.type=='user'){
+							left_content ='   <img class="image_inside_li img-circle" src="'+image_folder+test[i].profile_image+'">';
+							top_right_content = test[i].username;
+							bottom_right_content = test[i].name;
+							click_url="http://localhost:3000/explore/person/"+test[i].username;
+						}else{
+							left_content ='<h3>#</h3>';
+							top_right_content=test[i]._id;
+							bottom_right_content=test[i].post+" post";
+							click_url="http://localhost:3000/explore/tags/"+test[i]._id;
+
+						}
+
+						html_str+='<li class="li_bg">';
+						//html_str+= '<a class="a_no_dec" href="#">';
+						html_str+= '<a class="a_no_dec" href="'+click_url+'">';
+						html_str+='<div class="row">';	//start row
+						html_str+='<div class="col-md-2" style="text-align: center;">';
+						html_str+=	left_content;
+						html_str+='</div>';//end left content
+						html_str+='		<div class="col-md-10 remove_cursor">';
+						html_str+='			<div class="dec_username">';
+						html_str+='				'+top_right_content;
+						html_str+='			</div>';
+						html_str+='			<div class="dec_detail_name">';
+						html_str+='				'+bottom_right_content;
+						html_str+='			</div>';
+						html_str+='		</div>';
+						html_str+='</div>' //end row
+						html_str+='</a>';
+						html_str+='</li>';
+					}
+				}//end ifdata.msg=="success"
+				else{ // NOT FOUND
+					navigate_page="";
+					//console.log('man '+test)
+					html_str+='<li class="li_bg">';
+					//	html_str+='   <img class="image_inside_li img-circle" src="'+image_folder+test[i].profile_image+'">'
+						html_str+='		<div>';
+						html_str+='			<div class="force_text_center">';
+						html_str+='				Not found';
+						html_str+='			</div>';
+						html_str+='			<div class="force_text_center">';
+						html_str+='				'+test;
+						html_str+='			</div>';
+						html_str+='		</div>';
+						html_str+='</li>';
+				}
+				html_str+="</ul>";
+				$('#search_result_item').find('ul').remove();
+				$( "#search_result_item" ).append(html_str);
+				//$( "#search_result_item" ).html(html_str);
+			})
+			.fail(function(data) {
+				navigate_page="";
+				console.log( "error" );
+			});
+		}
+	}//end check_explore_data
+	function navigate_first_node(){
+		var check_txt = $("#search_txt").val().trim();
+		check_txt = check_txt.replace("#", "");
+		//var res = str.
+		if(navigate_page.trim().length>0 &&
+		 (check_txt.length>0)) 
+		{
+			console.log('nav here '+navigate_page);
+			window.location.href = navigate_page;
+			//console.log('focusing '+($("#search_txt").is(":focus")));
+		}	
+	}
+
+</script>
+<style type="text/css">
+	.force_text_center{
+		text-align: center;
+	}
+	.left_bg{
+		/*background-color: #A4A4A4;*/
+		/*background-color: red;*/
+	}
+	.center_bg{
+		/*background-color: #F7D358;*/
+	}
+	.right_bg{
+		/*background-color: #D0FA58;*/
+	}
+	.inside_center_bg{
+		/*background-color: red;*/
+		z-index: 100;
+		position: absolute;
+		width: 100%;
+	}
+	.inside_center_bg ul {
+		width: 80%;
+		max-width: 440px;
+		max-height: 240px; overflow: auto;
+		/*background-color: #D0FA58;*/
+		background-color: red;
+		list-style: none;
+		padding: 0px;
+		margin: 0 auto;
+		margin-top: -10px;
+		border: solid 1px #dbdbdb;
+		box-shadow: 0 0 5px rgba(0,0,0,.13);
+		border-radius: 3px;
+		overflow-x: hidden;
+	}
+	.li_bg{
+		max-width: 460px;
+		/*background-color: #FBFBEF;*/
+		background-color: white;
+		padding-right: 10px;
+		padding-left: 10px;
+		padding-top: 5px;
+		padding-bottom: 5px;
+		border-bottom: solid 1px #dbdbdb;
+	}
+	.image_inside_li{
+		width: 32px;
+		height: 32px;
+
+	}
+	.remove_cursor{
+		/*cursor:default;
+*/	}
+	.a_no_dec{
+		color: #003569;
+		text-decoration: none;
+		z-index: 1011;
+	}
+	.dec_username{
+		color: #262626;
+		font-weight: 400;
+		text-overflow: ellipsis;
+	}
+	.dec_detail_name{
+		color: #999;
+		font-weight: 300;
+	}
+</style>
+<nav class='nav_bg '>
+			<div class='row nav_space'>
+				<div class="col-md-4 left_col_bg ">
+					<div class="nav_link_menu ">
+ 						<a href="#" >Home</a>
+ 					</div>
+				</div> <!-- end left col -->
+  				<div class="col-md-4 center_col_bg">
+  					<div class="inner-addon left-addon fix_input_width">
+					    <i class="glyphicon glyphicon-search"></i>
+					    <input type="text" id='search_txt' class="form-control input-sm " placeholder="Search">
+					</div>
+				  	
+  				</div> <!-- end center col -->
+ 				<div class="col-md-4 right_col_bg">
+ 					<div class="nav_link_menu">
+ 						<a href="#" >LogIn</a>
+ 					</div>
+ 				</div> <!-- end right col -->
+			</div> <!-- end class row -->
+</nav>
+
+<div class="row" id='search_result'>
+	<div class="col-md-4 left_bg"></div> <!-- end right offset -->
+	<div class="col-md-4 center_bg"> 
+		<div class="inside_center_bg" id='search_result_item'> <!-- bg red -->
+				
+		</div> <!-- end inside_center_bg -->
+	</div> <!-- end col-md-4 center_bg -->
+	<div class="col-md-4 right_bg"></div> <!-- end left offset -->
+</div>
+<!-- <div id='result_data'>
+	resul
+</div> -->
