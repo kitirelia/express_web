@@ -1,0 +1,84 @@
+<% include ../partials/header_modal %>
+<script type="text/javascript">
+		$(document).ready(function(){
+		//	alert('ready');
+		var host = window.location.origin+"/explore/modal/";
+		console.log("host is "+host);
+			$('body').on('click','img',
+				function(){
+					var this_id = $(this).attr('id');
+					var real_path = $(this).attr('src');
+					//var parent_id = $(this).parent().attr('id');
+					
+					//alert(this_id);
+					var prefix_id="hash_img";
+					if(typeof this_id !== typeof undefined && this_id !== false && this_id.indexOf(prefix_id)>=0) {
+						var clean_id = this_id.replace(prefix_id, "");
+						var jqxhr = $.get(host+clean_id, function(data) {
+							console.log('load '+(host+clean_id));
+							console.log('real_path '+real_path);
+							$('#content_image').attr('src',data.content.image);
+							$('#owner_profile_image ').attr('src',data.owner_data.profile);
+							$('#create_time').text(data.content.time);
+							$('#owner_username').text(data.owner_data.username);
+							$('#owner_username').attr('href',data.owner_data.nav_data);
+							$('#content_caption').html(data.content.caption);
+						 	$('#myModal').modal('show'); // imagemoda
+						 	$('#myModal').on('show.bs.modal', function () {
+							});
+						})
+						.fail(function(data) {
+								console.log( "error" );
+						});
+					}//end if typeof
+				}//end func
+			);//end $('body').on('click','img',
+		});//end (document).ready
+		//$('.scrollDiv').css('max-height',$(window).height());
+</script>
+
+<!-- Modal -->
+<div class="container">
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div id="modal_dialog" class="modal-dialog modal-lg " role="document">
+	    <div class="modal-content">
+	    	<div class="modal-body clean_border add_row_space">
+
+	    		<div class='row'>
+	    			<div class="col-md-8">
+	    				<img id='content_image' class="img-responsive check_img_bg" src="">
+	    			</div>
+	    			<div class="col-md-4">
+	    			<div style=" border-bottom: 1px solid #efefef;">
+	    				<div class="row " style="margin-top:15px;">
+	    					<div class="col-md-3">
+	    					 <img id='owner_profile_image' class="img-responsive img-circle force_img_size" src="">
+	    					</div> <!-- end img profile -->
+	    					<div class="col-md-6 crop_txt"> 
+	    						<a id="owner_username" href="" class="username_color"> username</a>
+	    					</div>
+	    					<div class="col-md-3 follow_go_left button_bg">
+	    						 <button  type="button" class="btn btn-success button_remove_space ">follow</button>
+	    					</div> <!-- end follow btn -->
+	    				</div> <!-- end row for user profile -->
+	    				</div>
+	    				<div>
+	    					<div class="row add_20_top_bot_space">
+	    					<div class="col-md-10 likes_dec">90 Likes</div>
+	    					<div id="create_time" class="col-md-2 time_dec">5 hrs</div>
+	    					</div>
+	    				</div> <!-- end if following,follower -->
+	    				<div id='content_caption' class="caption_dec">
+	    					 
+	    				</div> <!-- end div caption -->
+	    			</div> <!-- end block profile section -->
+	    			
+	    		</div> <!-- end class main row -->
+	    		 
+	    		
+		    	
+	    	</div> <!-- end modal-body -->
+	    </div><!-- end modal-content -->
+	</div><!-- end modal-dialog -->
+</div> <!-- end modal fade -->
+</div>

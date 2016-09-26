@@ -6,12 +6,71 @@
     <script   src="https://code.jquery.com/jquery-1.12.4.js"   integrity="sha256-Qw82+bXyGq6MydymqBxNPYTaUXXq7c8v3CwiYwLLNXU="   crossorigin="anonymous"></script>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-    <% include ../partials/header_person_view %>
-    <title><%= user.fullname %> @<%= user.username %></title>
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
-    <style>
-        body        { padding-top:80px; word-wrap:break-word; }
-    </style>
+    <% include ../partials/header_person_view %>
+    <title><%= data.user.fullname %> @<%= data.user.username %></title>
+    
+  
+    <script type="text/javascript">
+         var owner_id = "<%= data.user._id %>" ; //var test is now assigned to getTest which will only work on browsers
+        $( document ).ready(function() {
+
+           if(<%= data.user.private %>){
+                //console.log('on');
+                $('#private_checkbox').bootstrapToggle('on');
+           }else if(<%= !data.user.private %>){
+                //console.log('OFF');
+                $('#private_checkbox').bootstrapToggle('off');
+           }
+
+           $('#private_checkbox').change(function() {
+                var current_use = $(this).prop('checked');            
+                 var dataObject = { 
+                    'msg': 'update_private', 
+                    'data': current_use,
+                    'owner' :owner_id
+                };
+                $.ajax({
+                    url: "/account/edit",
+                    type: 'PUT',    
+                    data: dataObject,
+                    dataType: 'json',
+                    success: function(result) {
+                        if(result.msg==false){
+                            //console.log('OFF '+result.msg);
+                            //$('#private_checkbox').bootstrapToggle('off');
+                        }else{
+                           //  console.log('On '+result.msg);
+                           // $('#private_checkbox').bootstrapToggle('on');
+                        }
+                    },
+                    error: function (jqXHR, exception) {
+                       // console.log(jqXHR.status);
+                    }
+                });//end ajax
+            });//end change
+
+
+           //------------- crop image---
+           $('img').on('load', function() {
+                //console.log("id "+$(this).attr('id'));
+                if(typeof $(this).attr('id') != 'undefined'){
+                    if(($(this).attr('id').indexOf('hash_img'))>=0  ){
+                        if($(this).width()>$(this).height()){
+                            $(this).addClass( "crop_for_h  " );
+                        }else{
+                            $(this).addClass( "crop_for_v " );
+                        }
+                    }
+                }
+            });//end load
+
+        });//end doc ready
+    </script>
+    <% include ../partials/scroll_check %>
+    
 </head>
 <body>
 <% include ../partials/header_person_view %>
@@ -31,18 +90,19 @@
                 <h3><span class="fa fa-user"></span> Local</h3>
 
                     <p>
-                        <strong>id</strong>: <%= user._id %><br>
-                        <strong>email</strong>: <%= user.email %><br>
-                        <strong>password</strong>: <%= user.password %>
-                        <strong>profile_image</strong>: <%= user.profile_image%>
-                    </p>
+                        <strong>id</strong>: <%= data.user._id %><br>
+                        <strong>email</strong>: <%= data.user.email %><br>
+                        <strong>private</strong>: <%= data.user.private %>
+                        <strong>profile_image</strong>: <%= data.user.profile_image%>
 
+                    </p>
+                    <input id='private_checkbox' type="checkbox" checked data-toggle="toggle" data-onstyle="info" data-on="on" data-off="off">
             </div>
         </div>
         <div class="col-sm-6">
             <div class="well">
                 <h3><span class="fa fa-user"></span> Local</h3>
-                <img src="uploads/bot/<%= user.profile_image%>"  width="100" heigth="100">
+                <img src="<%= data.user.profile_picture%>"  width="100" heigth="100">
 
             </div>
         </div>
@@ -50,5 +110,69 @@
     </div>
 
 </div>
+
+
+
+
+
+<div id='debug_container' style="margin-top:40px;">
+        <div class="row">
+            <div class="col-md-2 "></div>
+            <div class="col-md-8 ">
+                <div class="" style="margin-bottom:40px;">
+                    <div class='row'>
+                        <div class="col-md-4">
+
+                            <img src="<%= data.user.profile_picture  %>"  alt="profile image" height="150px" width="150px" class="img-circle img_border" style='margin-left: 30px'>
+                        </div> <!-- end div-img-col-md-2 -->
+                        <div class="col-md-6">
+                            <div id='user_name'>
+                                <div>
+                                    <h1 class="username_deco"><%= data.user.username %></h1>
+                                    <!-- <button  type="button" class="btn btn-success ">follow</button> -->
+                                </div>
+                                <div>
+                                    <h3  class="fullname_deco"><%= data.user.fullname %></h3>
+                                </div>
+                            </div>  <!-- end id user_name -->
+                            <div id='about_user'>
+                                <div id='user_status' class="row">
+                                    <div class="col-md-4"><span class="deco_span"><%= data.stat.post %></span> <span class="deco_span_unit">posts</span></div>
+                                    <div class="col-md-4"><span class="deco_span">0</span> <span class="deco_span_unit"> follower</span></div>
+                                    <div class="col-md-4"><span class="deco_span">0</span> <span class="deco_span_unit"> following</span></div>
+                                </div> <!-- end div user_status -->
+                            </div> <!-- end id  about_user -->
+                        </div> <!-- end col-md-8 -->
+                        <div class="col-md-2">
+
+                        </div> <!-- end md-2 right offset -->
+                    </div>  <!-- end class row -->
+                </div> <!-- end about_user_bg -->
+                <div class="image_debug_bg" id="image_content">
+                    <% for(var i=0; i<data.result.length; i++) { %>
+                        <div class='jonat-thumbnail img_size_preview'>
+                            <img  id='hash_img<%= data.result[i]._id %>' src="<%= data.result[i].filename %>" >
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+            <div class="col-md-2 "></div>
+        </div> <!-- end class row -->
+    </div>
+
+    <!-- preload -->
+    <div class="row">
+        <div class="col-md-2 "></div>
+        <div class="col-md-8 content_tag_bg">
+        <div style="margin-top:40px;">
+            <div id='footer_preload' ></div>    
+        </div>
+        </div> <!-- end class="col-md-8 content_tag_bg" -->
+        <div class="col-md-2 "></div>
+    </div>
+
+
+
+
 </body>
 </html>

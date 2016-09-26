@@ -14,7 +14,7 @@ var userSchema = mongoose.Schema({
 	},
     password: { type: String, trim:true,required:[true,'no password'], select: false ,min: [3,'password too short']},
     profile_image:String,
-    staff_level:Number,
+    staff_level:{type:Number,select:false},
     created_at: {
         type: Date,
         required: false,
