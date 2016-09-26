@@ -24,9 +24,6 @@ module.exports = function(app,passport){
 	app.get('/me',isLoggedIn,function(req,res){
 		//res.redirect('/explore/person/'+req.user.username);
 		prepare_data_for_me(req,res);
-		// res.render('pages/me.ejs',{
-		// 	user:req.user
-		// });
 	});
 
 	app.get('/logout',function(req,res){
@@ -72,7 +69,7 @@ function prepare_data_for_me(req,res){
 						for(var i=0;i<result.length;i++){
 									result[i].filename=image_folder+result[i].filename;
 						}
-						var _url = host+"/explore/recent?uid="+me._id+"&max_id="+result[result.length-1]._id;
+					//	var _url = host+"/explore/recent?uid="+me._id+"&max_id="+result[result.length-1]._id;
 						var obj = {
 							user:{
 								_id:me._id,
@@ -83,7 +80,7 @@ function prepare_data_for_me(req,res){
 							},
 							pagination:{
 								has_next:true,
-								next_url:host+"/explore/person/recent?uid="+me._id+"&max_id="+result[result.length-1]._id,
+								next_url:host+"/explore/user/recent?uid="+me._id+"&max_id="+result[result.length-1]._id,
 								//next_url:_url,
 								next_max_id:result[result.length-1]._id
 							},

@@ -6,8 +6,6 @@
 		var is_going_down =false;
 		var lastScrollTop = $(this).scrollTop();
 		var next_url='<%- data.pagination.next_url %>';
-		//next_url = next_url.replace("&","");
-		//alert('<%= data.pagination.next_url %>');
 		var has_next_page=Boolean('<%= data.pagination.has_next %>');
 
 		//console.log('set next |'+has_next_page,'| boolean ',typeof(has_next_page));
