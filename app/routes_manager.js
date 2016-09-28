@@ -44,10 +44,7 @@ module.exports = function(app,passport){
 };
 
 function prepare_data_for_me(req,res){
-	//console.log(chalk.bgCyan(me));
-	
 	var me =req.user;
-	//console.log(chalk.yellow(base_url));
 	var host = getURL(req);
 	var my_all_post=0;
 	Content
@@ -67,9 +64,16 @@ function prepare_data_for_me(req,res){
 						res.json({msg:'err'});
 					}else{
 						for(var i=0;i<result.length;i++){
-									result[i].filename=image_folder+result[i].filename;
+							result[i].filename=image_folder+result[i].filename;
 						}
-					//	var _url = host+"/explore/recent?uid="+me._id+"&max_id="+result[result.length-1]._id;
+						var has_next_page =true;
+						var next_page_url = host+"/explore/user/recent?uid="+me._id+"&max_id="+result[result.length-1]._id;
+						///console.log(chalk.yellow('res '+result.length));
+						if(result.length<15){
+							has_next_page=false;
+							next_page_url="none";
+							//console.log(chalk.red('set '+has_next_page));
+						}
 						var obj = {
 							user:{
 								_id:me._id,
@@ -79,9 +83,8 @@ function prepare_data_for_me(req,res){
 								private:me.private
 							},
 							pagination:{
-								has_next:true,
-								next_url:host+"/explore/user/recent?uid="+me._id+"&max_id="+result[result.length-1]._id,
-								//next_url:_url,
+								has_next:has_next_page,
+								next_url:next_page_url,
 								next_max_id:result[result.length-1]._id
 							},
 							meta:{
@@ -94,7 +97,7 @@ function prepare_data_for_me(req,res){
 							},
 							result
 						}//end obj
-
+						//console.log(chalk.bgRed(obj.pagination.has_next));
 						//res.json(obj);
 						res.render('pages/me.ejs',{
 							data:obj

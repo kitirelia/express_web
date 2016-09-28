@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">	
+	<script   src="https://code.jquery.com/jquery-2.2.4.min.js"   integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="   crossorigin="anonymous"></script>
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+	<% include ../partials/header_tag_view %>
+
+	<title>View HashTag</title>
+
+	
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$('img').on('load', function() {
+			//	console.log("found image "+$(this).attr('id'));
+				if(typeof $(this).attr('id') != 'undefined'){
+				//	console.log("addclass id "+$(this).attr('id'));
+			    	if(($(this).attr('id').indexOf('hash_img'))>=0  ){
+				    	if($(this).width()>$(this).height()){
+				    		$(this).addClass( "crop_for_h  " );
+				    	}else{
+				    		$(this).addClass( "crop_for_v " );
+				    	}
+			    	}
+		    	}
+			});//end load
+
+			$("#image_content").on('load', function(){ 
+				console.log('!!!!!')
+			});
+		
+		//console.log('end doc ready');
+		});//end doc ready
+
+	</script>
+	
+	<% include ../partials/scroll_check %>
+	
+</head>
+<body style="background-color:#fafafa;">
+	<% include ../partials/nav_bar %>
+	
+	<div id='all'>
+		<div class="row">
+			<div class="col-md-2 "></div> <!-- left offest -->
+	  		<div class="col-md-8 content_tag_bg">
+				<div id='tag_title '>
+					<h1 style="text-align:center;">#<%= data.tag_data.hashtag_name %></h1>
+					<div style="text-align:center;"><span class="num_post_dec"><%= data.tag_data.all_post %></span><span class="num_post_dec_2"> post</span></div>
+					<!-- <h4 style="text-align:center;"> posts</h4> -->
+				</div>  	
+				<div id="image_content" class="content_img_bg">
+				
+				<% for(var i=0; i<data.data.length; i++) { %>
+			        <div class='jonat-thumbnail img_size_preview'>
+						<img  id='hash_img<%= data.data[i]._id %>' src="<%= data.data[i].filename %>" >
+					</div>
+			    <% } %>
+				</div>	 <!-- end #image_content  -->
+				
+	  		</div> <!-- end class="col-md-8 content_tag_bg" -->
+	  		<div class="col-md-2 "></div> <!-- righ offest -->
+		</div> <!-- end class="row" -->
+	</div> <!-- end id='all' -->
+	<div class="row">
+		<div class="col-md-2 "></div>
+		<div class="col-md-8 content_tag_bg">
+		<div style="margin-top:40px;">
+			<div id='footer_preload' ></div>	
+		</div>
+		</div> <!-- end class="col-md-8 content_tag_bg" -->
+		<div class="col-md-2 "></div>
+	</div>
+</body>
+</html>
