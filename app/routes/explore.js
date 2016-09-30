@@ -304,6 +304,7 @@ module.exports = function(passport) {
 	});//end /person
 
 	router.get('/person/:userName',function(req,res){
+		console.log(chalk.bgRed('redirect here '+req.params.userName));
 		User
 			.findOne({'username':req.params.userName})
 			.exec(function (err,result){
@@ -320,6 +321,7 @@ module.exports = function(passport) {
 					}else{
 						//res.send('hello '+req.params.userName);
 						prepare_data_for_person(result,req,res);
+						
 						//console.log('id '+result._id);
 					}
 				}
@@ -327,7 +329,7 @@ module.exports = function(passport) {
 		
 	});//end get person
 
-	router.get('/user/recent',isLoggedIn,function(req,res){
+	router.get('/user/recent',function(req,res){
 		Content
 			.find({'owner':req.query.uid})
 			.exec(function (err,result){
@@ -412,30 +414,28 @@ function getHost(req){
 }
 
 function isLoggedIn(req,res,next){
-	console.log(chalk.red('---------------------------------------'));
-		
-	
 	if(req.isAuthenticated()){
 		return next();
 	}else if(!req.isAuthenticated()){
-		if (req.xhr || req.headers.accept.indexOf('json') > -1) {
-		 console.log(chalk.bgCyan('AJAX'));
-		 	res.json({
-						pagination:{
-								has_next:false,
-								next_url:"",
-								next_max_id:""
-						},
-						meta:{
-							code:403
-						},
-						result:""
-					});
-		} else {
-			console.log(chalk.bgGreen('web req'));
-			res.render('pages/index.ejs');
-		  // send your normal response here
-		}
+		//if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+		 // console.log(chalk.bgCyan('AJAX'));
+		 // 	res.json({
+			// 			pagination:{
+			// 					has_next:false,
+			// 					next_url:"stop here",
+			// 					next_max_id:""
+			// 			},
+			// 			meta:{
+			// 				code:403
+			// 			},
+			// 			result:""
+			// 		});
+		// } else {
+		// 	console.log(chalk.bgGreen('web req'));
+		// 	res.render('pages/index.ejs');
+		//   // send your normal response here
+		// }
+		res.render('pages/index.ejs');
 	}
 	//res.render('pages/index.ejs');
 }
@@ -444,8 +444,6 @@ function prepare_data_for_person(user,req,res){
 	var me =user;
 	//console.log(chalk.yellow(base_url));
 	var host = getHost(req);
-	console.log('host is '+host);
-	//var host = "www.gogole.com";
 	var my_all_post=0;
 	Content
 		.where('owner', me._id).count(function (err, count) {
@@ -465,7 +463,7 @@ function prepare_data_for_person(user,req,res){
 						//console.log('end aggregate')
 						for(var i=0;i<result.length;i++){
 								result[i].filename=host+"/"+image_folder+result[i].filename;
-								console.log(chalk.green(i,result[i].filename));
+								//console.log(chalk.green(i,result[i].filename));
 						}
 						
 						var obj = {

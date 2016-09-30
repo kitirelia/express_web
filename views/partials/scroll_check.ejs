@@ -5,7 +5,7 @@
 	    var loading_new_feed =false;
 		var is_going_down =false;
 		var lastScrollTop = $(this).scrollTop();
-		console.log('scrll');
+		//console.log('scrll');
 		//console.log(<%- data.pagination.next_url %>);
 		var next_url='<%- data.pagination.next_url %>';
 		var has_next_page=<%= data.pagination.has_next %>;
@@ -35,11 +35,11 @@
 		function show_preload(){
 			var html_str="";
 			$( "#footer_preload" ).addClass( "preload_loader" );
-		//	console.log('start load: '+next_url);
+			console.log('start load: '+next_url);
 			var jqxhr = $.get(next_url, function(data) {
 				current_page+=1;
 				console.log('now page '+current_page);
-				console.log(data);
+				//console.log(data);
 				console.log('--------------------')
 				next_url = data.pagination.next_url;
 				console.log('next '+data.pagination.next_url);
