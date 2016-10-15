@@ -18,6 +18,7 @@ var configDB = require('./config/database.js');
 var explore = require('./app/routes/explore.js');
 var flash_api = require('./app/routes/flash_api.js');
 var account = require('./app/routes/account.js');
+var feed = 	  require('./app/routes/feed.js');
 
 
 mongoose.connect(configDB.url);
@@ -54,6 +55,7 @@ require('./app/routes_manager.js')(app, passport); // load our routes and pass i
 app.use('/explore', explore(passport));
 app.use('/flash_api',flash_api);
 app.use('/account',account(passport));
+app.use('/feed',feed(passport));
 // launch ======================================================================
 app.listen(port,function (){
 	console.log(chalk.green('server start...'+port));

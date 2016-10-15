@@ -15,20 +15,28 @@ module.exports = function(app,passport){
 		res.render('pages/login.ejs',{message:req.flash('loginMessage')});
 	});
 	app.post('/login',passport.authenticate('local-kiti-login',{
-		successRedirect:'/me',
+		successRedirect:'/feed',
+		//successRedirect:'/me',
 		failureRedirect:'/login',
 		failureFlash:true
 	})
 
 	);//end app.post login
 	app.get('/me',isLoggedIn,function(req,res){
+		//console.log(chalk.bgRed('session is '+req.session));
 		prepare_data_for_me(req,res);
 	});
 
-	app.get('/me/recent',isLoggedIn,(req,res) =>{
-		console.log(chalk.bgGreen('me recent owner '+req.query.uid)+" max id"+req.query.max_id);
-		prepare_me_json(req.query.uid,req.query.max_id,req,res);
-		
+	app.get('/me/recent',isLoggedIn_Json,function(req,res){
+		if(req.session.passport['user']==req.query.uid){
+			prepare_me_json(req.query.uid,req.query.max_id,req,res);
+		}else{
+			console.log('spam');
+			res.status(403).send({ 
+		        success: false, 
+		        message: 'No token provided.' 
+		    });
+		}
 	});
 
 	app.get('/logout',function(req,res){
@@ -52,8 +60,9 @@ function prepare_me_json(uid,last_id,req,res){
 	//console.log('here for me ');
 	Content
 			.find({'owner':uid})
+			.sort({'createdAt':-1})
 			.exec(function (err,result){
-				console.log(chalk.green('get data '+result.length));
+				//console.log(chalk.green('get data '+result.length));
 				var find_index = -1;
 				for(var i=0;i<result.length;i++){
 					if(result[i]._id ==last_id){
@@ -64,7 +73,7 @@ function prepare_me_json(uid,last_id,req,res){
 				//console.log('end for');
 				var has_next_page = false;
 				var host = getOrigin(req);
-				console.log(chalk.bgYellow("first "+host));
+				//console.log(chalk.bgYellow("first "+host));
 				var image_host = getHost(req);
 				var num_limit = 15;
 				
@@ -89,8 +98,12 @@ function prepare_me_json(uid,last_id,req,res){
 					//console.log(chalk.cyan('host: '+host),has_next);
 					host = host.replace(req.query.max_id,result[result.length-1]._id);
 					host =host.replace("%3F","?");
-					console.log(chalk.yellow('now host')+host);
+					//console.log(chalk.yellow('now host')+host);
+					var feed_link=getHost(req)+'/feed';
 					res.json({
+						nav_bar:{
+							feed_url:feed_link
+						},
 						pagination:{
 								has_next:has_next_page,
 								next_url:host,
@@ -122,6 +135,7 @@ function prepare_data_for_me(req,res){
 	var me =req.user;
 	var host = getOrigin(req);
 	var my_all_post=0;
+	var feed_link=getHost(req)+'/feed';
 	Content
 		.where('owner', me._id).count(function (err, count) {
 		  if (err) return handleError(err);
@@ -133,7 +147,12 @@ function prepare_data_for_me(req,res){
 					{
 					    $match: { 'owner': me._id }
 					},
-					{ "$limit": 15 }
+					{ 
+						$sort : { createdAt : -1 } 
+					},
+					{ 
+						"$limit": 15 
+					}
 				],function (err,result){
 					if(err){
 						res.json({msg:'err'});
@@ -144,13 +163,16 @@ function prepare_data_for_me(req,res){
 						var has_next_page =true;
 						//var next_page_url = host+"/explore/user/recent?uid="+me._id+"&max_id="+result[result.length-1]._id;
 						var next_page_url = host+"/recent?uid="+me._id+"&max_id="+result[result.length-1]._id;
-						console.log(chalk.bgCyan('new next '+next_page_url))
+						//console.log(chalk.bgCyan('new next '+next_page_url))
 						if(result.length<15){
 							has_next_page=false;
 							next_page_url="none";
 							//console.log(chalk.red('set '+has_next_page));
 						}
 						var obj = {
+							nav_bar:{
+								feed_url:feed_link
+							},
 							user:{
 								_id:me._id,
 								fullname:me.fullname,
@@ -210,7 +232,22 @@ function getHost(req){
 	return requrl;
 }
 
+function isLoggedIn_Json(req,res,next){
+	//console.log(chalk.bgRed('-----------req '+getOrigin(req)),req.isAuthenticated());
+	if(req.isAuthenticated()){
+		return next();
+	}else{
+		console.log(chalk.bgCyan('force redirect'));
+	}
+	res.status(403).send({ 
+		        success: false, 
+		        message: 'No token provided.' 
+	});
+	//console.log(chalk.bgYellow('-------- done render page'));
+}
+
 function isLoggedIn(req,res,next){
+	//console.log(chalk.bgRed('-----------req '+getOrigin(req)),req.isAuthenticated());
 	if(req.isAuthenticated()){
 		return next();
 	}

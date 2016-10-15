@@ -11,6 +11,7 @@ var Tag = require('../models/tags');
 var Content_Tag = require('../models/content_tag');
 var image_folder="uploads/bot/";
 var qs = require('querystring');
+var moment = require('moment');
 var num_limit =15;
 
 router.use(bodyParser.json()); // support json encoded bodies
@@ -40,7 +41,7 @@ module.exports = function(passport) {
 	});//end index
 	
 	router.get('/tags/recent',function(req,res){
-		console.log(chalk.bgYellow('tag and  recent '+req.query.max_id,"and tag "+req.query.tag));
+		//console.log(chalk.bgYellow('tag and  recent '+req.query.max_id,"and tag "+req.query.tag));
 		Content_Tag.find({tag_name:req.query.tag}, function (err,result) {
 			if(err){
 				res.json('err'+err);
@@ -190,12 +191,15 @@ module.exports = function(passport) {
 			      	}
 			      	var host = getHost(req);
 			      	host = host+"/explore/tags/recent?tag="+req.params.tagName+"&max_id="+_max_id;
-					//console.log('host '+host);
+					var feed_link=getHost(req)+'/feed';
 			      	for(var i=0;i<doc.length;i++){
 			      		doc[i].filename=getHost(req)+"/"+image_folder+doc[i].filename;
 			      		//console.log(chalk.cyan(i));
 			      	}///end for
 						var obj ={
+							nav_bar:{
+								feed_url:feed_link
+							},
 						 	pagination:{
 						 			has_next:has_next_page,
 							 		next_url:host,
@@ -304,7 +308,7 @@ module.exports = function(passport) {
 	});//end /person
 
 	router.get('/person/:userName',function(req,res){
-		console.log(chalk.bgRed('redirect here '+req.params.userName));
+		//console.log(chalk.bgRed('redirect here '+req.params.userName));
 		User
 			.findOne({'username':req.params.userName})
 			.exec(function (err,result){
@@ -330,8 +334,10 @@ module.exports = function(passport) {
 	});//end get person
 
 	router.get('/user/recent',function(req,res){
+		//console.log(chalk.bgRed('chec cookie'));
 		Content
 			.find({'owner':req.query.uid})
+			.sort({'createdAt':-1})
 			.exec(function (err,result){
 				console.log(chalk.green('get data '+result.length));
 				var find_index = -1;
@@ -391,6 +397,63 @@ module.exports = function(passport) {
 				}
 			});//end content.find
 	});//end get recent
+
+	router.get('/modal',function (req,res){
+		//console.log(chalk.bgGreen("req_id "+req.query.id));
+		Content
+			.findOne({'_id':req.query.id})
+			.exec(function (err,result){
+				if(err){
+					console.log(chalk.red('err '+err));
+					res.json({msg:'err'});
+				}else if(result){
+					//console.log('get lengnt '+result.length);
+					//console.log(chalk.bgYellow(result));
+					User
+						.findOne({'_id':result.owner})
+						.exec(function (err,user){
+							//console.log(chalk.bgCyan(user));
+							if(err){
+								console.log(chalk.red('err '+err));
+							}else if(user){
+								var host = getURL(req);
+								var image_host = getHost(req);
+								var content_image_url = image_host+"/"+image_folder+result.filename;
+								var caption_msg = result.caption;
+								if(result.caption=="null"){
+									console.log(chalk.bgRed('found null '+result.caption))
+									caption_msg = "";
+								}
+								var create_time = readable_time(result.createdAt);
+								caption_msg = hili_tag(caption_msg,getHost(req)+"/explore/tags/");
+								//console.log(chalk.bgGreen('content image '+content_image_url));
+								var owner_link = getHost(req)+"/explore/person/"+user.username;
+								res.json({
+									content:{
+										image:content_image_url,
+										time:create_time,
+										caption:caption_msg
+									},
+									owner_data:{
+										profile:image_host+"/"+image_folder+user.profile_image,
+										username:user.username,
+										nav_data:owner_link
+									}
+								});//end res.json
+							}//end else if user
+							
+						});//end User exec
+					
+					//res.json({msg:result});
+
+				}//end else if result
+				else if(!result){
+					console.log(chalk.bgRed('not found'));
+					res.json({msg:'not found'});
+				}
+			});//end findOne exec
+		
+	});//end get modal
      
     return router;
 }//end exports
@@ -417,24 +480,6 @@ function isLoggedIn(req,res,next){
 	if(req.isAuthenticated()){
 		return next();
 	}else if(!req.isAuthenticated()){
-		//if (req.xhr || req.headers.accept.indexOf('json') > -1) {
-		 // console.log(chalk.bgCyan('AJAX'));
-		 // 	res.json({
-			// 			pagination:{
-			// 					has_next:false,
-			// 					next_url:"stop here",
-			// 					next_max_id:""
-			// 			},
-			// 			meta:{
-			// 				code:403
-			// 			},
-			// 			result:""
-			// 		});
-		// } else {
-		// 	console.log(chalk.bgGreen('web req'));
-		// 	res.render('pages/index.ejs');
-		//   // send your normal response here
-		// }
 		res.render('pages/index.ejs');
 	}
 	//res.render('pages/index.ejs');
@@ -455,6 +500,9 @@ function prepare_data_for_person(user,req,res){
 					{
 					    $match: { 'owner': me._id }
 					},
+					{ 
+						$sort : { createdAt : -1 } 
+					},
 					{ "$limit": 15 }
 				],function (err,result){
 					if(err){
@@ -465,8 +513,11 @@ function prepare_data_for_person(user,req,res){
 								result[i].filename=host+"/"+image_folder+result[i].filename;
 								//console.log(chalk.green(i,result[i].filename));
 						}
-						
+						var feed_link=getHost(req)+'/feed';
 						var obj = {
+							nav_bar:{
+								feed_url:feed_link
+							},
 							user:{
 								_id:me._id,
 								fullname:me.fullname,
@@ -552,7 +603,8 @@ function hili_tag(str,url){
 }//end hilitag
 function readable_time(UNIX_timestamp) {
 			var now =new Date();
-			var then = new Date(UNIX_timestamp);
+			var then = moment(UNIX_timestamp, "MM-DD-YYYY");
+			//console.log('then--> '+then);
 			var time="wait";
 			var duration = moment.duration(moment(now).diff(then));
 			

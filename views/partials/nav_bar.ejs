@@ -103,9 +103,7 @@
 				}//end ifdata.msg=="success"
 				else{ // NOT FOUND
 					navigate_page="";
-					//console.log('man '+test)
 					html_str+='<li class="li_bg">';
-					//	html_str+='   <img class="image_inside_li img-circle" src="'+image_folder+test[i].profile_image+'">'
 						html_str+='		<div>';
 						html_str+='			<div class="force_text_center">';
 						html_str+='				Not found';
@@ -166,7 +164,7 @@
 		max-width: 440px;
 		max-height: 240px; overflow: auto;
 		/*background-color: #D0FA58;*/
-		background-color: red;
+		background-color: white;
 		list-style: none;
 		padding: 0px;
 		margin: 0 auto;
@@ -213,7 +211,7 @@
 			<div class='row nav_space'>
 				<div class="col-md-4 left_col_bg ">
 					<div class="nav_link_menu ">
- 						<a href="#" >Home</a>
+ 						<a href="<%= data.nav_bar.feed_url %>" >Home</a>
  					</div>
 				</div> <!-- end left col -->
   				<div class="col-md-4 center_col_bg">

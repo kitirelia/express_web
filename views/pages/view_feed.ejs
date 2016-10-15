@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Feed View</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	
+	<script   src="https://code.jquery.com/jquery-2.2.4.min.js"   integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="   crossorigin="anonymous"></script>
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	<link rel="stylesheet" type="text/css" href="public/css/feed_style.css">
+	
+</head>
+<body>
+	<% include ../partials/header_feed_view %>
+	<% include ../partials/nav_bar %>
+	<div class='container container_bg'>
+		<div class="row">
+		  <div class="col-md-3 col-xs-1 "></div> <!-- end left border -->
+		  <div class="col-md-6 col-xs-10">
+		  <% if(data.data.length>0){ %>
+			<% for(var i=0; i<data.data.length; i++) { %>
+                
+                <div class='feed_all_content'>
+
+	                <header class='header_main_content'>
+				  		<a class='a_header_image_profile'>
+				  			<img class="img-responsive img-circle" src="<%= data.data[i].owner.profile_image %>" style="width: 30px; height: 30px;">
+				  		</a>
+				  		<div class='force_same_line fix_box_width'>
+					  		<a class='feed_name_detail feed_dec_username'>
+					  				<%= data.data[i].owner.username %>
+					  		</a>
+					  		<a class='feed_name_detail'>
+					  				<%= data.data[i].owner.fullname %>
+					  		</a>
+				  		</div>
+				  		<a class='force_same_line push_right feed_name_detail' href='#'><time class='time_dec'><%= data.data[i].time %></time></a>
+				  	</header>
+				  	<div>
+				  		<img class="img-responsive" src="<%= data.data[i].filename %>" alt="Smiley face">
+				  	</div>
+				  	<div class='feed_caption_dec'>
+				  		
+			  			<%- data.data[i].caption %>
+			  		</div>
+                </div>
+            <% } %>
+			<% } else{ %>  
+			   <h1>bar</h1>
+			<% } %>
+		  
+		  </div> <!-- end div center -->
+		  <div class="col-md-3 col-xs-1"></div> <!-- end right border -->
+		</div>
+	</div>
+</body>
+</html>

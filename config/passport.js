@@ -103,7 +103,7 @@ module.exports = function(passport){
             }
 
             // all is well, return successful user
-            console.log(chalk.cyan(user));
+            //console.log(chalk.cyan(user));
             return done(null, user);
         });
 

@@ -8,8 +8,10 @@
 		//console.log('scrll');
 		//console.log(<%- data.pagination.next_url %>);
 		var next_url='<%- data.pagination.next_url %>';
+		//console.log(data.pagination.next_url);
 		var has_next_page=<%= data.pagination.has_next %>;
-		console.log('next_url '+next_url,has_next_page);
+		console.log('hast next '+has_next_page)
+		//console.log('next_url '+next_url,has_next_page);
 		//var req_url=next_url;
 		$(window).scroll(function(event){
 			var st = $(this).scrollTop();
@@ -35,18 +37,16 @@
 		function show_preload(){
 			var html_str="";
 			$( "#footer_preload" ).addClass( "preload_loader" );
-			console.log('start load: '+next_url);
+			//console.log('start load: '+next_url);
 			var jqxhr = $.get(next_url, function(data) {
+				console.log('load ajax success '+data.pagination.next_url);
 				current_page+=1;
-				console.log('now page '+current_page);
-				//console.log(data);
-				console.log('--------------------')
 				next_url = data.pagination.next_url;
-				console.log('next '+data.pagination.next_url);
+				//console.log('next '+data.pagination.next_url);
 				has_next_page=data.pagination.has_next;
 				loading_new_feed =false;
 				 $("#footer_preload" ).removeClass( "preload_loader" );
-				 console.log('----data----');
+				// console.log('----data----');
 					 for(var i=0; i<data.result.length; i++) {
 					 	html_str+="<div class='jonat-thumbnail img_size_preview'>";
 					 	html_str+="<img  id='hash_img"+data.result[i]._id+"' src='"+data.result[i].filename+"' class='crop_for_h'/>"
@@ -58,7 +58,8 @@
 
 			})
 			.fail(function(data) {
-				console.log( "error" );
+				console.log( "error " );
+				location.reload();
 				loading_new_feed =false;
 				$( "#footer_preload" ).removeClass( "preload_loader" );
 				

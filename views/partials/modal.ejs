@@ -7,16 +7,16 @@
 			$('body').on('click','img',
 				function(){
 					var this_id = $(this).attr('id');
-					var real_path = $(this).attr('src');
-					//var parent_id = $(this).parent().attr('id');
-					
-					//alert(this_id);
+					//var real_path = $(this).attr('src');
+
 					var prefix_id="hash_img";
 					if(typeof this_id !== typeof undefined && this_id !== false && this_id.indexOf(prefix_id)>=0) {
 						var clean_id = this_id.replace(prefix_id, "");
-						var jqxhr = $.get(host+clean_id, function(data) {
-							console.log('load '+(host+clean_id));
-							console.log('real_path '+real_path);
+						clean_id= host+"?id="+clean_id;
+						//console.log('here '+clean_id);
+						var jqxhr = $.get(clean_id, function(data) {
+							//console.log('load '+(clean_id));
+							console.log('data '+data.content.image);
 							$('#content_image').attr('src',data.content.image);
 							$('#owner_profile_image ').attr('src',data.owner_data.profile);
 							$('#create_time').text(data.content.time);
