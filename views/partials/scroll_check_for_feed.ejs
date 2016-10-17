@@ -1,0 +1,102 @@
+<link rel="stylesheet" type="text/css" href="/public/css/preload_style.css">
+<script type="text/javascript">
+	$(document).ready(function(){
+		
+		var current_page = 0;
+	    var loading_new_feed =false;
+		var is_going_down =false;
+		var lastScrollTop = $(this).scrollTop();
+		var next_url='<%- data.pagination.next_url %>';
+		//console.log(next_url);
+		var has_next_page=<%= data.pagination.has_next %>;
+		//console.log('hast next '+has_next_page)
+		//console.log('next_url '+next_url,has_next_page);
+		//var req_url=next_url;
+		$(window).scroll(function(event){
+			var st = $(this).scrollTop();
+			    if (st > lastScrollTop){
+			    	
+			    	is_going_down=true;
+			   } else {
+			   		
+			   		is_going_down=false;
+			   }
+			   lastScrollTop = st;
+			});
+	    window.onscroll = function(ev) {
+	    	//console.log('has next '+has_next_page);
+	    	//console.log('has_next_page '+has_next_page);
+		    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+		        if((is_going_down && !loading_new_feed) &&has_next_page){
+		        	loading_new_feed =true;
+		        	show_preload();
+		        }//end if
+		    }//end if
+		};//end window.onscroll
+		function show_preload(){
+			var html_str="";
+			$( "#footer_preload" ).addClass( "preload_loader" );
+			//console.log('start load: '+next_url);
+			var jqxhr = $.get(next_url, function(data) {
+				//console.log('load ajax success '+data.pagination.next_url);
+				current_page+=1;
+				next_url = data.pagination.next_url;
+				//console.log('next '+data.pagination.next_url);
+				has_next_page=data.pagination.has_next;
+				loading_new_feed =false;
+				 $("#footer_preload" ).removeClass( "preload_loader" );
+				// console.log('----data----');
+					 for(var i=0; i<data.data.length; i++) {
+					 	//console.log(data.data[i])
+					 	html_str+="<div class='feed_all_content'>";
+
+					 	html_str+="		<header class='header_main_content'>";
+					 	html_str+="			<a class='a_header_image_profile'>";
+					 	html_str+='				<img class="img-responsive img-circle" src="'+data.data[i].owner.profile_image+'" style="width: 30px; height: 30px;">';
+					 	html_str+="			</a>";
+					 	html_str+="			<div class='force_same_line fix_box_width'>";
+					 	html_str+="				<a class='feed_name_detail feed_dec_username'>";
+					 	html_str+="					"+data.data[i].owner.username +"";
+					 	html_str+="				</a>";
+					 	html_str+="				<a class='feed_name_detail'>";
+					 	html_str+="					"+data.data[i].owner.fullname ;
+					 	html_str+="				</a>";
+					 	html_str+="			</div>";
+					 	html_str+="			<a class='force_same_line push_right feed_name_detail' href='#'><time class='time_dec'>"+data.data[i].time+"</time></a>";
+					 	html_str+="		</header>";
+					 	html_str+="		<div>";
+					 	html_str+='		<img class="img-responsive" src="'+data.data[i].filename +'" alt="Image Content">';
+					 	html_str+="		</div>";
+					 	html_str+="		<div class='feed_caption_dec'>"
+
+					 	html_str+= data.data[i].caption ;
+					 	html_str+="		</div>";
+
+					 	html_str+="</div>";
+
+
+					 	// html_str+="<div class='jonat-thumbnail img_size_preview'>";
+					 	// html_str+="<img  id='hash_img"+data.result[i]._id+"' src='"+data.result[i].filename+"' class='crop_for_h'/>"
+					 	// html_str+="</div>";
+	     
+					  }
+					  $("#image_content").append(html_str);
+			})
+			.done(function(data) {
+
+			})
+			.fail(function(data) {
+				console.log( "error " );
+				location.reload();
+				loading_new_feed =false;
+				$( "#footer_preload" ).removeClass( "preload_loader" );
+				
+			});
+			
+		}//end show preload
+
+		function hello_image(){
+			console.log('hello image');
+		}
+	});//end ready
+</script>

@@ -9,7 +9,7 @@
 	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 	<link rel="stylesheet" type="text/css" href="public/css/feed_style.css">
-	
+	<% include ../partials/scroll_check_for_feed %>
 </head>
 <body>
 	<% include ../partials/header_feed_view %>
@@ -17,7 +17,7 @@
 	<div class='container container_bg'>
 		<div class="row">
 		  <div class="col-md-3 col-xs-1 "></div> <!-- end left border -->
-		  <div class="col-md-6 col-xs-10">
+		  <div class="col-md-6 col-xs-10" id='image_content'>
 		  <% if(data.data.length>0){ %>
 			<% for(var i=0; i<data.data.length; i++) { %>
                 

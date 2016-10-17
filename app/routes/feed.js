@@ -6,7 +6,7 @@ var Content = require('../models/content');
 var url = require('url');
 var moment = require('moment');
 var image_folder="uploads/bot/";
-
+var num_limit=10;
 router.use(bodyParser.json()); // support json encoded bodies
 router.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 router.use(function timeLog(req, res, next) {
@@ -15,12 +15,13 @@ router.use(function timeLog(req, res, next) {
 });
 
 module.exports = function( passport) {
+	//router.get('/',function(req,res){
 	router.get('/',isLoggedIn,function(req,res){
-		console.log(chalk.green("session is "+req.session.passport['user']));
+		//console.log(chalk.green("session is "+req.session.passport['user']));
 		Content
 			.find({})
 			.populate('owner')
-			.limit(15)
+			.limit(num_limit)
 			.sort({'createdAt':-1})
 			.exec(function (err,result){
 				console.log('get res '+result.length);
@@ -29,26 +30,34 @@ module.exports = function( passport) {
 					res.json({msg:err});
 				}// end if err
 				if(result){
+					//console.log('before '+result.length);
+					//result.length=15;
 					var feed_link=getHost(req)+'/feed';
 					for(var i=0;i<result.length;i++){
 			      		result[i].filename=getHost(req)+"/"+image_folder+result[i].filename;
 			      		result[i].owner.profile_image = getHost(req)+"/"+image_folder+result[i].owner.profile_image
 			      		result[i].caption = hili_tag(result[i].caption,getHost(req)+"/explore/tags/");
 			      		result[i].time = readable_time(result[i].createdAt);
-			      		console.log(chalk.bgRed(result[i].time));
+			      		//console.log(chalk.bgRed(result[i].time));
 			      	}///end for
 			      	
-			      	//result[i].createdAt=readable_time(result[i].createdAt);
-			      	console.log(chalk.bgGreen(result[0]));
-			      	//console.log(chalk.bgCyan(result[0].owner.profile_image));
+					var _max_id="";
+			      	if(result.length>1){
+			      		_max_id = result[result.length-1]._id;
+			      		console.log(chalk.bgRed('_max '+_max_id));
+			      	}
+			      	var host = getURL(req);
+			      //	host = host.replace(req.query.max_id,result[result.length-1]._id);
+					host =host+"/recent?uid="+req.session.passport['user']+"&max_id="+_max_id;
+					console.log(chalk.bgCyan('next_url '+host));
 			      	var obj ={
 							nav_bar:{
 								feed_url:feed_link
 							},
 						 	pagination:{
-						 			has_next:false,
-							 		next_url:'www.google.com',
-							 		next_max_id:200
+						 			has_next:true,
+							 		next_url:host,
+							 		next_max_id:_max_id
 						 	},
 						 	data:result
 						 }//end obj
@@ -56,11 +65,105 @@ module.exports = function( passport) {
 				}//end if result
 			}//end exec
 			);//end Content.find
-			
-			
-		
-		//res.render('pages/signup.ejs', { message: req.flash('signupMessage') });
 	});//end index
+
+	router.get('/recent',isLoggedIn,function(req,res){
+	//router.get('/recent',function(req,res){
+		// console.log(req.query.uid);
+		// console.log(req.query.max_id);
+
+		Content
+			.find({})
+			.populate('owner')
+			.sort({'createdAt':-1})
+			.exec(function (err,result){
+				var has_next_page = false;
+				if(err){
+					res.json({
+						pagination:{
+								has_next:false,
+								next_url:"",
+								next_max_id:""
+						},
+						meta:{
+							code:403
+						},
+						result:""
+					});
+				}if(result){
+					var find_index = -1;
+					for(var i=0;i<result.length;i++){
+						if(result[i]._id ==req.query.max_id){
+							find_index = i;
+							break;
+						}
+					}
+					if(result.length>0 && (find_index+1)<result.length){
+						var start_cut = (find_index+1);
+						var cut_end = (find_index+1)+num_limit;
+						if(cut_end>result.length){
+							cut_end = result.length;
+						}
+						result=result.splice(start_cut,cut_end);
+						if(result.length>num_limit){
+							result.length=num_limit;
+							has_next_page=true;
+						}else if(result.length<=num_limit){
+							//console.log(chalk.bgYellow('this is last page'));
+						}
+						var host = getURL(req);
+						host = host.replace(req.query.max_id,result[result.length-1]._id);
+						host =host.replace("%3F","?");
+						var image_host = getHost(req);
+						var new_data = [];
+						for(i=0;i<result.length;i++){
+							var obj = new Object();
+
+							obj={
+								filename:(image_host+"/"+image_folder+result[i].filename),
+								owner:{
+									_id:result[i].owner._id,
+									private:result[i].owner.private,
+									username:result[i].owner.username,
+									fullname:result[i].owner.fullname,
+									profile_image: getHost(req)+"/"+image_folder+result[i].owner.profile_image
+								},
+								caption:hili_tag(result[i].caption,getHost(req)+"/explore/tags/"),
+								time:readable_time(result[i].createdAt)
+							}
+							new_data.push(obj);
+						}
+						
+						res.json({
+							pagination:{
+									has_next:has_next_page,
+									next_url:host,
+									next_max_id:result[result.length-1]._id
+							},
+							meta:{
+								code:200
+							},
+							data:new_data
+						});
+					}else{//last page
+						res.json({
+						pagination:{
+									has_next:false,
+									next_url:"",
+									next_max_id:""
+							},
+							meta:{
+								code:403
+							},
+							result:""
+						});
+					}//end last page
+					//console.log(chalk.green('find index '+find_index));
+				}
+				//console.log(chalk.bgGreen('done '+result.length));
+			});//end exec
+
+	});//end get recent
 	return router;
 }//end exports
 
@@ -75,6 +178,14 @@ function getHost(req){
 	    protocol: req.protocol,
 	    host: req.get('host'),
 	    //pathname: req.originalUrl,
+	});
+	return requrl;
+}
+function getURL(req){
+	var requrl = url.format({
+	    protocol: req.protocol,
+	    host: req.get('host'),
+	    pathname: req.originalUrl,
 	});
 	return requrl;
 }
