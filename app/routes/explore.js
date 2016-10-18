@@ -192,13 +192,21 @@ module.exports = function(passport) {
 			      	var host = getHost(req);
 			      	host = host+"/explore/tags/recent?tag="+req.params.tagName+"&max_id="+_max_id;
 					var feed_link=getHost(req)+'/feed';
+					
+					var need_login=true;
+					if(req.isAuthenticated()){
+						need_login=false;
+					}
+					console.log(chalk.bgCyan('------------'));
 			      	for(var i=0;i<doc.length;i++){
 			      		doc[i].filename=getHost(req)+"/"+image_folder+doc[i].filename;
 			      		//console.log(chalk.cyan(i));
 			      	}///end for
 						var obj ={
 							nav_bar:{
-								feed_url:feed_link
+								feed_url:feed_link,
+								show_login:need_login,
+								left_nav_to:"Feed",
 							},
 						 	pagination:{
 						 			has_next:has_next_page,
@@ -514,9 +522,15 @@ function prepare_data_for_person(user,req,res){
 								//console.log(chalk.green(i,result[i].filename));
 						}
 						var feed_link=getHost(req)+'/feed';
+						var need_login=true;
+						if(req.isAuthenticated()){
+							need_login=false;
+						}
 						var obj = {
 							nav_bar:{
-								feed_url:feed_link
+								feed_url:feed_link,
+								show_login:need_login,
+								left_nav_to:"Feed",
 							},
 							user:{
 								_id:me._id,

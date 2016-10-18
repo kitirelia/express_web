@@ -161,17 +161,16 @@ function prepare_data_for_me(req,res){
 							result[i].filename=image_folder+result[i].filename;
 						}
 						var has_next_page =true;
-						//var next_page_url = host+"/explore/user/recent?uid="+me._id+"&max_id="+result[result.length-1]._id;
 						var next_page_url = host+"/recent?uid="+me._id+"&max_id="+result[result.length-1]._id;
-						//console.log(chalk.bgCyan('new next '+next_page_url))
 						if(result.length<15){
 							has_next_page=false;
 							next_page_url="none";
-							//console.log(chalk.red('set '+has_next_page));
 						}
 						var obj = {
 							nav_bar:{
-								feed_url:feed_link
+								feed_url:feed_link,
+								show_login:false,
+								left_nav_to:"Feed",
 							},
 							user:{
 								_id:me._id,

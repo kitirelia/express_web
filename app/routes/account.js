@@ -33,10 +33,12 @@ module.exports = function(passport) {
 	});//end index
 	
 	router.put('/edit/',isLoggedIn,function (req,res){
+
 		User.findByIdAndUpdate(req.body.owner, { $set: { private: req.body.data }}, { new: true }, function (err, user) {
 		  if (err) {
 		  	res.json({status:'eror',msg:'error'})
 		  }else if(user){
+		  	console.log(chalk.bgCyan(user))
 		  	res.json({
 		  		status:'ok',
 		  		msg:user.private

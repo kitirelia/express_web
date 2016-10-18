@@ -3,6 +3,8 @@
 	var tag_url ="http://localhost:3000/explore/nav_tags/";
 	var people_url ="http://localhost:3000/explore/people/";
 	//var base_url="";
+	
+	
 	var navigate_page="";
 	$(function(){ // this will be called when the DOM is ready
 		$('#search_txt').keyup(function(e) {
@@ -208,10 +210,11 @@
 	}
 </style>
 <nav class='nav_bg '>
+
 			<div class='row nav_space'>
 				<div class="col-md-4 left_col_bg ">
 					<div class="nav_link_menu ">
- 						<a href="<%= data.nav_bar.feed_url %>" >Home</a>
+ 						<a href="<%= data.nav_bar.feed_url %>" ><%= data.nav_bar.left_nav_to %></a>
  					</div>
 				</div> <!-- end left col -->
   				<div class="col-md-4 center_col_bg">
@@ -223,7 +226,12 @@
   				</div> <!-- end center col -->
  				<div class="col-md-4 right_col_bg">
  					<div class="nav_link_menu">
- 						<a href="#" >LogIn</a>
+ 						<% if(data.nav_bar.show_login ==false  ){ %>
+ 							<a href="/logout" >LogOut</a>
+						
+						<% } else{ %>  
+						   <a href="/login" >LogIn</a>
+						<% } %>
  					</div>
  				</div> <!-- end right col -->
 			</div> <!-- end class row -->

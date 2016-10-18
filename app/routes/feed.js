@@ -32,9 +32,10 @@ module.exports = function( passport) {
 				if(result){
 					//console.log('before '+result.length);
 					//result.length=15;
-					var feed_link=getHost(req)+'/feed';
+					var feed_link=getHost(req)+'/me';
 					for(var i=0;i<result.length;i++){
 			      		result[i].filename=getHost(req)+"/"+image_folder+result[i].filename;
+			      		result[i].owner.username="<a href='"+getHost(req)+"/explore/person/"+result[i].owner.username+"' class='feed_name_detail feed_dec_username'>"+result[i].owner.username+"</a>" 
 			      		result[i].owner.profile_image = getHost(req)+"/"+image_folder+result[i].owner.profile_image
 			      		result[i].caption = hili_tag(result[i].caption,getHost(req)+"/explore/tags/");
 			      		result[i].time = readable_time(result[i].createdAt);
@@ -49,10 +50,16 @@ module.exports = function( passport) {
 			      	var host = getURL(req);
 			      //	host = host.replace(req.query.max_id,result[result.length-1]._id);
 					host =host+"/recent?uid="+req.session.passport['user']+"&max_id="+_max_id;
-					console.log(chalk.bgCyan('next_url '+host));
+					//console.log(chalk.bgCyan('session '+req.session.passport['user']));
 			      	var obj ={
+			      			user:{
+			      				_id:req.session.passport['user'],
+			      				username:'extend'
+			      			},
 							nav_bar:{
-								feed_url:feed_link
+								feed_url:feed_link,
+								show_login:false,
+								left_nav_to:"Me",
 							},
 						 	pagination:{
 						 			has_next:true,
@@ -124,7 +131,8 @@ module.exports = function( passport) {
 								owner:{
 									_id:result[i].owner._id,
 									private:result[i].owner.private,
-									username:result[i].owner.username,
+									username:"<a href='"+getHost(req)+"/explore/person/"+result[i].owner.username+"' class='feed_name_detail feed_dec_username'>"+result[i].owner.username+"</a>" ,
+									//username:result[i].owner.username,
 									fullname:result[i].owner.fullname,
 									profile_image: getHost(req)+"/"+image_folder+result[i].owner.profile_image
 								},
